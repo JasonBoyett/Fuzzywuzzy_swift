@@ -6,14 +6,16 @@
 //  Copyright © 2016 LiXian. All rights reserved.
 //
 
-import UIKit
+import Foundation
 
 class StringMatcher: NSObject {
     let str1: String
     let str2: String
 
-    lazy var levenshteinDistance: Int = LevenshteinDistance.distance(str1: self.str1, str2: self.str2)
-    lazy var commonSubStringPairs: [CommonSubstringPair] = CommonSubstrings.pairs(str1: self.str1, str2: self.str2)
+    lazy var levenshteinDistance: Int = LevenshteinDistance.distance(
+        str1: self.str1, str2: self.str2)
+    lazy var commonSubStringPairs: [CommonSubstringPair] = CommonSubstrings.pairs(
+        str1: self.str1, str2: self.str2)
 
     init(str1: String, str2: String) {
         self.str1 = str1
@@ -27,6 +29,4 @@ class StringMatcher: NSObject {
         return Float(lenSum - levenshteinDistance) / Float(lenSum)
     }
 
-
 }
-

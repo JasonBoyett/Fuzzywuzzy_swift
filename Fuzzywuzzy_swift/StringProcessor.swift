@@ -6,7 +6,7 @@
 //  Copyright © 2016 LiXian. All rights reserved.
 //
 
-import UIKit
+import Foundation
 
 class StringProcessor: NSObject {
     /// Process string by
@@ -18,16 +18,17 @@ class StringProcessor: NSObject {
         var str = str.lowercased()
 
         /// replace other charcters in to white space
-        let regex = try! NSRegularExpression(pattern: "\\W+",
-                                             options: NSRegularExpression.Options.caseInsensitive)
+        let regex = try! NSRegularExpression(
+            pattern: "\\W+",
+            options: NSRegularExpression.Options.caseInsensitive)
         let range = NSMakeRange(0, str.count)
-        str = regex.stringByReplacingMatches(in: str,
-                                             options: [],
-                                             range: range,
-                                             withTemplate: " ")
+        str = regex.stringByReplacingMatches(
+            in: str,
+            options: [],
+            range: range,
+            withTemplate: " ")
         str = str.trimmingCharacters(in: NSCharacterSet.init(charactersIn: " ") as CharacterSet)
 
         return str
     }
 }
-

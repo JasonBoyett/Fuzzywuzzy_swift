@@ -6,17 +6,17 @@
 //  Copyright © 2016 LiXian. All rights reserved.
 //
 
-import UIKit
+import Foundation
 
-public extension String {
+extension String {
     /// Basic Scoring Functions
-    static func fuzzRatio(str1: String, str2: String) -> Int {
+    public static func fuzzRatio(str1: String, str2: String) -> Int {
         let m = StringMatcher(str1: str1, str2: str2)
         return Int(m.fuzzRatio() * 100)
     }
 
     /// trys to match the shorter string with the most common substring of the longer one
-    static func fuzzPartialRatio(str1: String, str2: String) -> Int {
+    public static func fuzzPartialRatio(str1: String, str2: String) -> Int {
         let shorter: String
         let longer: String
         if str1.count < str2.count {
@@ -36,7 +36,8 @@ public extension String {
                 return 0
             }
             //str2.distance(from: pair.str2SubRange.lowerBound, to: longer.endIndex)
-            let sub2RemLen = longer.distance(from: pair.str2SubRange.lowerBound, to: longer.endIndex)
+            let sub2RemLen = longer.distance(
+                from: pair.str2SubRange.lowerBound, to: longer.endIndex)
             var longSubStart = pair.str2SubRange.lowerBound
             if sub2RemLen < shorter.count {
                 longSubStart = longer.index(longSubStart, offsetBy: sub2RemLen - shorter.count)
@@ -47,7 +48,8 @@ public extension String {
             let closedRange: Range = longSubStart..<longSubEnd
             let longSubStr = String(longer[closedRange])
             let r = StringMatcher(str1: shorter, str2: longSubStr).fuzzRatio()
-            if r > 0.995 { /// magic number appears in original python code
+            if r > 0.995 {
+                /// magic number appears in original python code
                 return 1
             } else {
                 return r
@@ -62,10 +64,13 @@ public extension String {
             str = StringProcessor.process(str: str)
         }
         let tokens = Array(str.components(separatedBy: " "))
-        return tokens.sorted().joined(separator: " ").trimmingCharacters(in: NSCharacterSet.init(charactersIn: "") as CharacterSet)
+        return tokens.sorted().joined(separator: " ").trimmingCharacters(
+            in: NSCharacterSet.init(charactersIn: "") as CharacterSet)
     }
 
-    static private func _fuzzTokenSort(str1: String, str2: String, partial: Bool = true, fullProcess: Bool = true) -> Int {
+    static private func _fuzzTokenSort(
+        str1: String, str2: String, partial: Bool = true, fullProcess: Bool = true
+    ) -> Int {
         let sorted1 = _fuzzProcessAndSort(str: str1, fullProcess: fullProcess)
         let sorted2 = _fuzzProcessAndSort(str: str2, fullProcess: fullProcess)
 
@@ -76,15 +81,21 @@ public extension String {
         }
     }
 
-    static func fuzzTokenSortRatio(str1: String, str2: String, fullProcess: Bool = true) -> Int {
+    public static func fuzzTokenSortRatio(str1: String, str2: String, fullProcess: Bool = true)
+        -> Int
+    {
         return _fuzzTokenSort(str1: str1, str2: str2, partial: false, fullProcess: fullProcess)
     }
 
-    static func fuzzPartialTokenSortRatio(str1: String, str2: String, fullProcess: Bool = true) -> Int {
+    public static func fuzzPartialTokenSortRatio(
+        str1: String, str2: String, fullProcess: Bool = true
+    ) -> Int {
         return _fuzzTokenSort(str1: str1, str2: str2, partial: true, fullProcess: fullProcess)
     }
 
-    static func _token_set(str1: String, str2: String, partial: Bool = true, fullProcess: Bool = true) -> Int {
+    public static func _token_set(
+        str1: String, str2: String, partial: Bool = true, fullProcess: Bool = true
+    ) -> Int {
         var p1 = str1
         var p2 = str2
         if fullProcess {
@@ -99,20 +110,25 @@ public extension String {
         tokens1.subtract(tokens2)
         tokens2.subtract(tokens1)
 
-        var sorted_sect   = intersection.sorted().joined(separator: " ")
+        var sorted_sect = intersection.sorted().joined(separator: " ")
         let sorted_1to2 = tokens1.sorted().joined(separator: " ")
         let sorted_2to1 = tokens2.sorted().joined(separator: " ")
 
         var combined_1to2 = sorted_sect + " " + sorted_1to2
         var combined_2to1 = sorted_sect + " " + sorted_2to1
 
-        sorted_sect   = sorted_sect.trimmingCharacters(in: NSCharacterSet.init(charactersIn: " ") as CharacterSet)
-        combined_1to2 = combined_1to2.trimmingCharacters(in: NSCharacterSet.init(charactersIn: " ") as CharacterSet)
-        combined_2to1 = combined_2to1.trimmingCharacters(in: NSCharacterSet.init(charactersIn: " ") as CharacterSet)
+        sorted_sect = sorted_sect.trimmingCharacters(
+            in: NSCharacterSet.init(charactersIn: " ") as CharacterSet)
+        combined_1to2 = combined_1to2.trimmingCharacters(
+            in: NSCharacterSet.init(charactersIn: " ") as CharacterSet)
+        combined_2to1 = combined_2to1.trimmingCharacters(
+            in: NSCharacterSet.init(charactersIn: " ") as CharacterSet)
 
-        let pariwise = [(sorted_sect, combined_1to2),
-                        (sorted_sect, combined_2to1),
-                        (combined_1to2, combined_2to1)]
+        let pariwise = [
+            (sorted_sect, combined_1to2),
+            (sorted_sect, combined_2to1),
+            (combined_1to2, combined_2to1),
+        ]
         let ratios = pariwise.map { (str1, str2) -> Int in
             if partial {
                 return String.fuzzPartialRatio(str1: str1, str2: str2)
@@ -124,12 +140,15 @@ public extension String {
         return ratios.max()!
     }
 
-    static func fuzzTokenSetRatio(str1: String, str2: String, fullProcess: Bool = true) -> Int {
+    public static func fuzzTokenSetRatio(str1: String, str2: String, fullProcess: Bool = true)
+        -> Int
+    {
         return _token_set(str1: str1, str2: str2, partial: false, fullProcess: fullProcess)
     }
 
-    static func fuzzPartialTokenSetRatio(str1: String, str2: String, fullProcess: Bool = true) -> Int {
+    public static func fuzzPartialTokenSetRatio(
+        str1: String, str2: String, fullProcess: Bool = true
+    ) -> Int {
         return _token_set(str1: str1, str2: str2, partial: true, fullProcess: fullProcess)
     }
 }
-
