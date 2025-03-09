@@ -38,17 +38,17 @@ extension Array where Element == String {
     ///   - caseSensitive: A Boolean indicating whether matching should be case-sensitive. Defaults to false.
     ///   - stringify: A closure that converts an element to its string representation. Defaults to using `String(describing:)`.
     ///   - fullProcess: A Boolean indicating whether full token processing should be applied. Defaults to true.
-    ///   - scoreOption: The fuzzy scoring algorithm to use.
+    ///   - scoreOption: The fuzzy scoring algorithm to use. Defaults to .standard
     /// - Returns: An array of tuples where each tuple contains the string element and its corresponding fuzzy match score.
     /// - Throws: `FuzzySortError.invalidFloor` if the floor value is not between 0 and 100, or `FuzzySortError.emptyQuery` if the query is empty.
     public func fuzzyMap(
-        match: Element,
+        match: String,
         floor: Int = 0,
         sorted: Bool = false,
         caseSensitive: Bool = false,
         stringify: ((Element) -> String) = { element in String(describing: element) },
         fullProcess: Bool = true,
-        scoreOption: FuzzyScoreOptions
+        scoreOption: FuzzyScoreOptions = .standard
     ) throws -> [(element: String, score: Int)] {
         return try self.fuzzyMap(
             query: match,
@@ -65,24 +65,24 @@ extension Array where Element == String {
     /// - Parameters:
     ///   - match: The query string used for fuzzy matching.
     ///   - floor: The minimum score (0 to 100) required for an element to be included. Defaults to 0.
-    ///   - fullProcess: A Boolean indicating whether full token processing should be applied. Defaults to true.
-    ///   - scoreOption: The fuzzy scoring algorithm to use.
     ///   - caseSensitive: A Boolean indicating whether matching should be case-sensitive. Defaults to false.
+    ///   - fullProcess: A Boolean indicating whether full token processing should be applied. Defaults to true.
+    ///   - scoreOption: The fuzzy scoring algorithm to use. Defaults to .standard
     /// - Returns: A sorted array of strings (in descending order by score) that match the query.
     /// - Throws: `FuzzySortError.invalidFloor` if the floor value is invalid, or `FuzzySortError.emptyQuery` if the query is empty.
     public func fuzzySort(
         match: String,
         floor: Int = 0,
+        caseSensitive: Bool = false,
         fullProcess: Bool = true,
-        scoreOption: FuzzyScoreOptions,
-        caseSensitive: Bool = false
+        scoreOption: FuzzyScoreOptions = .standard
     ) throws -> [String] {
         return try self.fuzzySort(
             query: match,
             floor: floor,
+            caseSensitive: caseSensitive,
             fullProcess: fullProcess,
-            scoreOption: scoreOption,
-            caseSensitive: caseSensitive
+            scoreOption: scoreOption
         )
     }
 }
@@ -94,29 +94,29 @@ extension Array where Element: Any {
     /// - Parameters:
     ///   - match: The query element. Its string representation is derived using the `stringify` closure.
     ///   - floor: The minimum fuzzy score (0 to 100) required for an element to be included. Defaults to 0.
+    ///   - caseSensitive: A Boolean indicating whether matching should be case-sensitive. Defaults to false.
     ///   - stringify: A closure that converts an element to a string. Defaults to using `String(describing:)`.
     ///   - scoreOption: The fuzzy scoring algorithm to use. Defaults to `.standard`.
     ///   - fullProcess: A Boolean indicating whether full token processing should be applied. Defaults to true.
-    ///   - caseSensitive: A Boolean indicating whether matching should be case-sensitive. Defaults to false.
     /// - Returns: A sorted array of elements (in descending order by score) that match the query.
     /// - Throws: `FuzzySortError.invalidFloor` if the floor is not in the valid range, or `FuzzySortError.emptyQuery` if the query is empty.
     public func fuzzySort(
         match: Element,
         floor: Int = 0,
+        caseSensitive: Bool = false,
         stringify: ((Element) -> String) = { element in String(describing: element) },
         scoreOption: FuzzyScoreOptions = .standard,
-        fullProcess: Bool = true,
-        caseSensitive: Bool = false
+        fullProcess: Bool = true
     ) throws -> [Element] {
         let query = stringify(match)
 
         return try self.fuzzySort(
             query: query,
             floor: floor,
+            caseSensitive: caseSensitive,
             stringify: stringify,
             fullProcess: fullProcess,
-            scoreOption: scoreOption,
-            caseSensitive: caseSensitive
+            scoreOption: scoreOption
         )
     }
 
@@ -129,7 +129,7 @@ extension Array where Element: Any {
     ///   - caseSensitive: A Boolean specifying whether matching should be case-sensitive. Defaults to false.
     ///   - stringify: A closure that converts an element to its string representation. Defaults to using `String(describing:)`.
     ///   - fullProcess: A Boolean indicating whether full token processing should be applied. Defaults to true.
-    ///   - scoreOption: The fuzzy scoring algorithm to use.
+    ///   - scoreOption: The fuzzy scoring algorithm to use. Defaults to .standard
     /// - Returns: An array of tuples where each tuple contains the element and its corresponding fuzzy match score.
     /// - Throws: `FuzzySortError.invalidFloor` if the floor value is out of range, or `FuzzySortError.emptyQuery` if the query is empty.
     public func fuzzyMap(
@@ -139,7 +139,7 @@ extension Array where Element: Any {
         caseSensitive: Bool = false,
         stringify: ((Element) -> String) = { element in String(describing: element) },
         fullProcess: Bool = true,
-        scoreOption: FuzzyScoreOptions
+        scoreOption: FuzzyScoreOptions = .standard
     ) throws -> [(element: Element, score: Int)] {
         let query = stringify(match)
 
@@ -159,19 +159,19 @@ extension Array where Element: Any {
     /// - Parameters:
     ///   - query: The query string used for fuzzy matching.
     ///   - floor: The minimum acceptable score (0 to 100) for an element to be included. Defaults to 0.
+    ///   - caseSensitive: A Boolean specifying whether the matching should be case-sensitive. Defaults to false.
     ///   - stringify: A closure that converts an element into its string representation. Defaults to using `String(describing:)`.
     ///   - fullProcess: A Boolean indicating whether full token processing should be applied. Defaults to true.
-    ///   - scoreOption: The fuzzy scoring algorithm to use.
-    ///   - caseSensitive: A Boolean specifying whether the matching should be case-sensitive. Defaults to false.
+    ///   - scoreOption: The fuzzy scoring algorithm to use. Defaults to .standard
     /// - Returns: A sorted array of elements that match the query, sorted in descending order by fuzzy score.
     /// - Throws: `FuzzySortError.invalidFloor` if the floor value is not valid, or `FuzzySortError.emptyQuery` if the query is empty.
     public func fuzzySort(
         query: String,
         floor: Int = 0,
+        caseSensitive: Bool = false,
         stringify: ((Element) -> String) = { element in String(describing: element) },
         fullProcess: Bool = true,
-        scoreOption: FuzzyScoreOptions,
-        caseSensitive: Bool = false
+        scoreOption: FuzzyScoreOptions = .standard
     ) throws -> [Element] {
 
         return try self.fuzzyMap(
@@ -205,7 +205,7 @@ extension Array where Element: Any {
         caseSensitive: Bool = false,
         stringify: ((Element) -> String) = { element in String(describing: element) },
         fullProcess: Bool = true,
-        scoreOption: FuzzyScoreOptions
+        scoreOption: FuzzyScoreOptions = .standard
     ) throws -> [(element: Element, score: Int)] {
 
         guard floor >= 0 && floor <= 100 else { throw FuzzySortError.invalidFloor }
